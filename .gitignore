@@ -15,3 +15,7 @@ public/*
 .llm_log_redact.txt
 llm_logs.csv.*.tmp
 __pycache__/
+
+# Cloud credentials for Claude to provision Atlas/Render; never commit
+.atlas_api_keys
+.render_api_key
