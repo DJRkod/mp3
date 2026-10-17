@@ -10,3 +10,8 @@ public/*
 
 # Environment variables (copy .env.example to .env). Never commit .env
 .env
+
+# LLM log tooling (course LLM policy: chat logs are exported to llm_logs.csv)
+.llm_log_redact.txt
+llm_logs.csv.*.tmp
+__pycache__/

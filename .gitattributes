@@ -1,0 +1,2 @@
+# The exporter writes this file itself; keep Git from rewriting its line endings.
+llm_logs.csv -text

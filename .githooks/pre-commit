@@ -1,0 +1,8 @@
+#!/bin/sh
+# Regenerate the LLM conversation log and include it in every commit, so no
+# commit of LLM-assisted code ships without its chat log (course LLM policy).
+python scripts/export_llm_logs.py || {
+  echo "pre-commit: llm_logs.csv export failed; commit blocked." >&2
+  exit 1
+}
+git add llm_logs.csv
