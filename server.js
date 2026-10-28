@@ -4,7 +4,7 @@ var express = require('express'),
     mongoose = require('mongoose');
 
 // Read .env file
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 
 // Create our Express application
 var app = express();
@@ -12,8 +12,10 @@ var app = express();
 // Use environment defined port or 3000
 var port = process.env.PORT || 3000;
 
-// Connect to a MongoDB --> Uncomment this once you have a connection string!!
-//mongoose.connect(process.env.MONGODB_URI).catch(function (err) { console.error('MongoDB connection error:', err.message); });
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI).catch(function (err) {
+    console.error('MongoDB connection error:', err.message);
+});
 
 // Allow CORS so that backend and frontend could be put on different servers
 var allowCrossDomain = function (req, res, next) {
@@ -27,6 +29,11 @@ app.use(allowCrossDomain);
 // Parse URL-encoded and JSON request bodies
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Health check for the deployment platform
+app.get('/', function (req, res) {
+    res.json({ message: 'OK', data: null });
+});
 
 // Use routes as a module (see index.js)
 require('./routes')(app, router);
