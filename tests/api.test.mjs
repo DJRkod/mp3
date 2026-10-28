@@ -32,6 +32,10 @@ async function api(method, url, body) {
         headers: body === undefined ? {} : { 'Content-Type': 'application/json' },
         body: body === undefined ? undefined : (typeof body === 'string' ? body : JSON.stringify(body)),
     });
+    if (res.status === 204) {
+        assert.equal(await res.text(), '', `204 on ${method} ${url} must have an empty body`);
+        return { status: 204 };
+    }
     const json = await res.json();
     assert.ok('message' in json && 'data' in json, `envelope missing on ${method} ${url}: ${JSON.stringify(json)}`);
     assert.equal(typeof json.message, 'string');
@@ -436,23 +440,23 @@ test('PUT /tasks/:id can reassign a completed task without touching pendingTasks
 
 // ---------- DELETE ----------
 
-test('DELETE /tasks/:id removes the task and takes it out of pendingTasks; 404 afterwards', async () => {
+test('DELETE /tasks/:id is 204 with no body, takes the task out of pendingTasks; 404 afterwards', async () => {
     const u = await makeUser();
     const t = await makeTask({ assignedUser: u._id });
     const res = await del(`/tasks/${t._id}`);
-    assert.equal(res.status, 200);
+    assert.equal(res.status, 204);
     assert.equal((await get(`/tasks/${t._id}`)).status, 404);
     assert.deepEqual((await user(u._id)).pendingTasks, []);
     assert.equal((await del(`/tasks/${t._id}`)).status, 404);
     assert.equal((await del('/tasks/garbage')).status, 404);
 });
 
-test('DELETE /users/:id removes the user and unassigns all their tasks, completed ones too', async () => {
+test('DELETE /users/:id is 204 with no body and unassigns all their tasks, completed ones too', async () => {
     const u = await makeUser();
     const pending = await makeTask({ assignedUser: u._id });
     const done = await makeTask({ assignedUser: u._id, completed: true });
     const res = await del(`/users/${u._id}`);
-    assert.equal(res.status, 200);
+    assert.equal(res.status, 204);
     assert.equal((await get(`/users/${u._id}`)).status, 404);
     for (const id of [pending._id, done._id]) {
         const t = await task(id);
